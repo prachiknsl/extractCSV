@@ -1,88 +1,114 @@
 <html>
- <head>
-  <title>CSV File to HTML Table Using AJAX jQuery</title>
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
-  <script src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" />
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-<style>
-.table {
-    display: block;
-    overflow-x: auto;
-    white-space: nowrap;
-    width:1000px;
-}
+<head>
+ <title>JavaScript</title>
+ <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+ <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"/>
+ <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+ <link rel="stylesheet" href="https://unpkg.com/bootstrap-table@1.16.0/dist/bootstrap-table.min.css">
+ <script src="https://unpkg.com/bootstrap-table@1.16.0/dist/bootstrap-table.min.js"></script>
+ <style>
 
-</style>
- </head>
- <body>
-  <div class="container">
-   <div class="table-responsive">
-    <h1 align="center">CSV File to HTML Table Using JavaScript</h1>
-    <br />
-    <div align="center">
-	 <input type="file" id="csvFileInput" onchange="handleFiles(this.files)"
-            accept=".csv">
-    </div>
-    <br />
-    <div id="employee_table">
-    </div>
-   </div>
+ </style>
+</head>
+<body>
+<div className="container">
+ <div className="table-responsive">
+  <h1 align="center">CSV File to HTML Table Using JavaScript</h1>
+  <br/>
+  <div align="center">
+   <input type="file" id="csvFileInput" onChange="handleFiles(this.files)" accept=".csv">
   </div>
- </body>
+  <br/>
+  <div id="employee_table">
+  </div>
+ </div>
+</div>
+</body>
 <script>
-var table_data;
  function handleFiles(files) {
-      if (window.FileReader) {
-          getAsText(files[0]);
-      } else {
-          alert('FileReader are not supported in this browser.');
-      }
-    }
+  console.log(files);
+  if (window.FileReader) {
+   getAsText(files[0]);
+  } else {
+   alert('FileReader are not supported in this browser.');
+  }
+ }
 
-    function getAsText(fileToRead) {
-      var reader = new FileReader(); 
-      reader.readAsText(fileToRead);
-      reader.onload = loadHandler;
-      reader.onerror = errorHandler;
-    }
+ function getAsText(fileToRead) {
+  let reader = new FileReader();
+  reader.readAsText(fileToRead);
+  reader.onload = loadHandler;
+  reader.onerror = errorHandler;
+ }
 
-    function loadHandler(event) {
-      var csv = event.target.result;
-      processData(csv);
-    }
+ let s = 0, e;
+ let employee_data;
 
-    function processData(csv) {
-       var employee_data = csv.split(/\r?\n|\r/);
-     table_data = '<table class="table table-bordered table-striped">';
-    for(var count = 0; count<employee_data.length; count++)
-    {
-     var cell_data = employee_data[count].split(",");
-     table_data += '<tr>';
-     for(var cell_count=0; cell_count<cell_data.length; cell_count++)
-     {
-      if(count === 0)
-      {
-       table_data += '<th>'+cell_data[cell_count]+'</th>';
-      }
-      else
-      {
-       table_data += '<td>'+cell_data[cell_count]+'</td>';
-      }
-     }
-     table_data += '</tr>';
-    }
-    table_data += '</table>';
-console.log(table_data);
+ function prev() {
+  if (s > 0) {
+   s--;
+   processData(s);
+  }
+ }
 
-    document.getElementById('employee_table').innerHTML = table_data;
-    }
+ function next() {
+  s++;
+  if (s >= (e - 3)) {
+   document.getElementById("next").disabled = true;
+  }
+  processData(s);
+ }
 
-    function errorHandler(evt) {
-      if(evt.target.error.name == "NotReadableError") {
-          alert("Canno't read file !");
-      }
+ function loadHandler(event) {
+  let csv = event.target.result;
+  employee_data = csv.split(/\r?\n|\r/);
+  e = employee_data[0].split(",").length;
+  processData(s);
+ }
+
+ function processData(s) {
+  let div,table_data;
+  if (e > 5)
+   div = '<div><button id="prev"  class="btn btn-primary" onclick="prev()">prev</button> ' +
+           ' <button id="next" class="btn btn-primary" onclick="next()">next</button></div><br>'
+  table_data = div + '<table class="table table-bordered table-striped">';
+  for (let count = 0; count < employee_data.length; count++) {
+   let cell_data = employee_data[count].split(",");
+   if (count === 0)
+    table_data += '<thread>';
+   table_data += '<tr>';
+   for (let cell_count = s; cell_count < s + 5; cell_count++) {
+    if (count === 0) {
+     let t = cell_data[cell_count];
+     table_data += '<th>' + cell_data[cell_count] + '</th>';
+    } else {
+     table_data += '<td>' + cell_data[cell_count] + '</td>';
     }
+   }
+   table_data += '</tr>';
+   if (count === 0)
+    table_data += '</thread>';
+  }
+  table_data += '</table>';
+
+  document.getElementById('employee_table').innerHTML = table_data;
+  if (s <= 0) {
+   document.getElementById("prev").disabled = true;
+  } else {
+   document.getElementById("prev").disabled = false;
+  }
+  if ((s + 6) > e) {
+   document.getElementById("next").disabled = true;
+  } else {
+   document.getElementById("next").disabled = false;
+  }
+ }
+
+ function errorHandler(evt) {
+  if (evt.target.error.name == "NotReadableError") {
+   alert("Can't read file !");
+  }
+ }
 
 </script>
 </html>
